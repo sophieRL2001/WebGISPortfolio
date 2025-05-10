@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Web GIS Portfolio</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1em 0;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .project-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .map-container iframe {
+            width: 100%; 
+            height: 600px; 
+            border: 1px solid #ccc;         }
+        footer {
+            text-align: center;
+            padding: 1em 0;
+            background-color: #333;
+            color: #fff;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>My Web GIS Portfolio</h1>
+    </header>
+
+    <div class="container">
+
+        <section class="project-section">
+            <h2>Project 1: DC Homicide Incidents Map</h2>
+            <p>
+                This interactive map displays homicide incidents in DC for 2024.
+                You can click on incidents to see more details and use the filters
+                to explore the data by method or ward.
+            </p>
+            <p>
+                The map utilizes Mapbox GL JS for rendering and interactivity,
+                visualizing data sourced from public crime incident reports.
+            </p>
+
+            <div class="map-container">
+                <iframe src="homicide_map_finalP.html" title="DC Homicide Incidents Map"></iframe>
+            </div>
+
+            <p>
+                <em> Compared to the first attempt</em>
+            </p>
+        </section>
+
+        <section class="project-section">
+            <h2>Another Project (Placeholder)</h2>
+            <p>
+                Description of another amazing Web GIS project will go here.
+                You can add more sections like this for other portfolio pieces.
+            </p>
+        </section>
+
+
+    </div>
+
+    <footer>
+        <p> 2025 Sophie Lind - Web GIS Portfolio</p>
+    </footer>
+
+</body>
+</html>
