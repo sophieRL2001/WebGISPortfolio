@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,4 +96,103 @@
         });
     </script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Homicide Incidents Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+        .map-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            max-width: 200px;
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .mapboxgl-popup-content {
+            padding: 15px;
+            font-size: 14px;
+        }
+        .mapboxgl-popup-content h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+            color: #333;
+        }
+        .mapboxgl-popup-content p {
+            margin: 0 0 5px;
+        }
+        .mapboxgl-popup-content p strong {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <div class="map-overlay" id="features">
+        <h2>2024 Homicide Incidents</h2>
+        <div id="pd">
+            <p>Click a point on the map</p>
+            <p>src: https://catalog.data.gov/dataset/crime-incidents-in-2024</p>
+        </div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic29waGllcm9zZTcyNCIsImEiOiJjbTlpdHQ1YjkwNWYxMnJvdnU2bmhkZWN1In0.iJYR13OLGSPGlw-Lths1OQ';
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/sophierose724/cm9lvvnce009q01rz40h5ey3y',
+            center: [-77.0369, 38.9072],
+            zoom: 12
+        });
+
+        map.addControl(new mapboxgl.NavigationControl());
+        map.addControl(new mapboxgl.ScaleControl());
+
+        map.on('click', (e) => {
+            const features = map.queryRenderedFeatures(e.point, { layers: ['HOMICIDE'] });
+            if (!features.length) return;
+
+            const f = features[0];
+            const date = f.properties.REPORT_DAT
+                ? new Date(f.properties.REPORT_DAT).toLocaleDateString()
+                : 'N/A';
+
+            new mapboxgl.Popup({ offset: [0, -15] })
+                .setLngLat(f.geometry.coordinates)
+                .setHTML(`
+                    <h3>Homicide Incident</h3>
+                    <p><strong>Date:</strong> ${date}</p>
+                    <p><strong>Method:</strong> ${f.properties.METHOD || 'N/A'}</p>
+                    <p><strong>Block:</strong> ${f.properties.BLOCK || 'N/A'}</p>
+                    <p><strong>Ward:</strong> ${f.properties.WARD || 'N/A'}</p>
+                    <p><strong>District:</strong> ${f.properties.DISTRICT || 'N/A'}</p>
+                    <p><strong>Neighborhood Cluster:</strong> ${f.properties.NEIGHBORHOOD_CLUSTER || 'N/A'}</p>
+                `)
+                .addTo(map);
+        });
+
+        map.on('mouseenter', 'HOMICIDE', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'HOMICIDE', () => {
+            map.getCanvas().style.cursor = '';
+        });
+    </script>
+</body>
+>>>>>>> 4b28a4d7209dcf54445c5d7ade6e664c4c724999
 </html>
