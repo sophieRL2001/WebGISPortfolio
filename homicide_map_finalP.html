@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Homicide Incidents Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+        .map-overlay {
+            position: absolute;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            font-size: 14px;
+            line-height: 1.4;
+            z-index: 1; /* Ensure overlays are on top */
+        }
+
+        #info-overlay {
+            top: 10px;
+            left: 10px;
+            max-width: 250px;
+        }
+
+        #filters-overlay {
+            top: 10px;
+            right: 50px;
+            max-width: 220px;
+        }
+        #filters-overlay label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        #filters-overlay select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+
+        #legend-overlay {
+            bottom: 30px;
+            right: 10px;
+            max-width: 200px;
+        }
+        #legend-overlay h4 {
+            margin: 0 0 5px 0;
+            font-size: 15px;
+        }
+        .legend-key {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 5px;
+            border: 1px solid #555;
+        }
+
+        .mapboxgl-popup-content {
+            padding: 15px;
+            font-size: 14px;
+            min-width: 250px;
+        }
+        .mapboxgl-popup-content h3 {
+            margin: 0 0 10px;
+            font-size: 16px;
+            color: #333;
+        }
+        .mapboxgl-popup-content p {
+            margin: 0 0 5px;
+        }
+        .mapboxgl-popup-content p strong {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Informational Overlay -->
+    <div class="map-overlay" id="info-overlay">
+        <h2>2024 DC Homicide Incidents</h2>
+        <div id="pd">
+            <p>Explore incidents by clicking points and using the filter.</p>
+            <p>src: <a href="https://catalog.data.gov/dataset/crime-incidents-in-2024" target="_blank" rel="noopener noreferrer">Crime Incidents 2024</a></p>
+        </div>
+    </div>
+
+    <!-- Filters Overlay -->
+    <div class="map-overlay" id="filters-overlay">
+        <h4>Filter Incidents</h4>
+        <div>
+            <label for="method-filter">By Method:</label>
+            <select id="method-filter">
+                <option value="all">All Methods</option>
+                <option value="GUN">Gun</option>
+                <option value="KNIFE">Knife</option>
+                <option value="OTHERS">Others</option>
+            </select>
+        </div>
+        <div>
+            <label for="ward-filter">By Ward:</label>
+            <select id="ward-filter">
+                <option value="all">All Wards</option>
+                <option value="1">Ward 1</option>
+                <option value="2">Ward 2</option>
+                <option value="3">Ward 3</option>
+                <option value="4">Ward 4</option>
+                <option value="5">Ward 5</option>
+                <option value="6">Ward 6</option>
+                <option value="7">Ward 7</option>
+                <option value="8">Ward 8</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Legend Overlay -->
+    <div class="map-overlay" id="legend-overlay">
+        <h4>Incident Method</h4>
+        <div><span class="legend-key" style="background-color: #E31A1C;"></span>Gun</div>
+        <div><span class="legend-key" style="background-color: #FF7F00;"></span>Knife</div>
+        <div><span class="legend-key" style="background-color: #33A02C;"></span>Others</div>
+        <div><span class="legend-key" style="background-color: #B0B0B0;"></span>Unknown/Other</div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic29waGllcm9zZTcyNCIsImEiOiJjbTlpdHQ1YjkwNWYxMnJvdnU2bmhkZWN1In0.iJYR13OLGSPGlw-Lths1OQ';
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/sophierose724/cmaik8iy6019701s045l5bp0z',
+            center: [-77.0369, 38.9072],
+            zoom: 11.5
+        });
+
+        map.addControl(new mapboxgl.NavigationControl());
+        map.addControl(new mapboxgl.ScaleControl());
+
+        const methodColors = {
+            'GUN': '#E31A1C',
+            'KNIFE': '#FF7F00',
+            'OTHERS': '#33A02C',
+            'DEFAULT': '#B0B0B0'
+        };
+
+        map.on('load', () => {
+            // Apply data-driven styling for circle color based on METHOD
+            map.setPaintProperty('HOMICIDE', 'circle-color', [
+                'match',
+                ['upcase', ['to-string', ['get', 'METHOD']]],
+                'GUN', methodColors.GUN,
+                'KNIFE', methodColors.KNIFE,
+                'OTHERS', methodColors.OTHERS,
+                methodColors.DEFAULT
+            ]);
+
+            // Set a default circle radius and stroke
+            map.setPaintProperty('HOMICIDE', 'circle-radius', 6);
+            map.setPaintProperty('HOMICIDE', 'circle-stroke-width', 1);
+            map.setPaintProperty('HOMICIDE', 'circle-stroke-color', '#FFFFFF');
+            map.setPaintProperty('HOMICIDE', 'circle-opacity', 0.85);
+
+            // Basic cursor change on hover (no feature state changes)
+            map.on('mouseenter', 'HOMICIDE', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'HOMICIDE', () => {
+                map.getCanvas().style.cursor = '';
+            });
+        });
+
+        map.on('click', 'HOMICIDE', (e) => {
+            if (!e.features || !e.features.length) return;
+
+            const f = e.features[0];
+            const date = f.properties.REPORT_DAT
+                ? new Date(f.properties.REPORT_DAT).toLocaleDateString()
+                : 'N/A';
+
+            const method = f.properties.METHOD ? String(f.properties.METHOD).toUpperCase() : 'UNKNOWN';
+            const pointColor = methodColors[method] || methodColors.DEFAULT;
+
+  
+            const searchUrl = `https://www.google.com/search?q=${date} homicide DC site:https://mpdc.dc.gov/`;
+
+
+            new mapboxgl.Popup({ offset: [0, -15] })
+                .setLngLat(f.geometry.coordinates)
+                .setHTML(`
+                    <h3 style="border-bottom: 2px solid ${pointColor}; padding-bottom: 5px;">Homicide Incident</h3>
+                    <p><strong>Date:</strong> ${date}</p>
+                    <p><strong>Method:</strong> ${f.properties.METHOD || 'N/A'}</p>
+                    <p><strong>Block:</strong> ${f.properties.BLOCK || 'N/A'}</p>
+                    <p><strong>Ward:</strong> ${f.properties.WARD || 'N/A'}</p>
+                    <p><strong>District:</strong> ${f.properties.DISTRICT || 'N/A'}</p>
+                    <p><strong>Neighborhood Cluster:</strong> ${f.properties.NEIGHBORHOOD_CLUSTER || 'N/A'}</p>
+                    <p style="margin-top: 10px;"><a href="${searchUrl}" target="_blank" rel="noopener noreferrer">Search for this incident</a></p>
+                `)
+                .addTo(map);
+        });
+
+        const methodFilterElement = document.getElementById('method-filter');
+        const wardFilterElement = document.getElementById('ward-filter');
+
+        function applyFilters() {
+            const filters = ['all'];
+
+            const selectedMethod = methodFilterElement.value;
+            if (selectedMethod !== 'all') {
+                filters.push(['==', ['upcase', ['to-string', ['get', 'METHOD']]], selectedMethod.toUpperCase()]);
+            }
+
+            const selectedWard = wardFilterElement.value;
+            if (selectedWard !== 'all') {
+                filters.push(['==', ['to-string', ['get', 'WARD']], selectedWard]);
+            }
+            
+            map.setFilter('HOMICIDE', filters.length > 1 ? filters : null);
+        }
+
+        methodFilterElement.addEventListener('change', applyFilters);
+        wardFilterElement.addEventListener('change', applyFilters);
+
+    </script>
+</body>
+</html>
