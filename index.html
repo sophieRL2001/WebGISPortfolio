@@ -3,46 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Web GIS Portfolio</title>
+    <title>Sophie Lind's Web GIS Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Add script to load the embeddable map component -->
+    <script type="module" src="https://js.arcgis.com/embeddable-components/4.32/arcgis-embeddable-components.esm.js"></script>
     <style>
+        :root {
+            --primary-color: #007bff; /* A vibrant blue */
+            --secondary-color: #17a2b8; /* A nice teal for accents */
+            --dark-color: #2c3e50; /* Darker shade for text */
+            --light-color: #f8f9fa; /* Light background */
+            --white-color: #ffffff;
+            --gray-border: #e0e0e0;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
         body {
-            font-family: sans-serif;
+            font-family: 'Lato', sans-serif;
             margin: 0;
             padding: 0;
-            line-height: 1.6;
+            line-height: 1.7;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
+
         header {
-            background-color: #fff;
-            color: #fff;
-            padding: 1em 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--white-color);
+            padding: 2.5em 1em; /* Increased padding */
             text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+
+        header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 2.8em; /* Larger title */
+            margin: 0;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
         .container {
-            width: 80%;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            width: 85%;
+            max-width: 1100px; /* Max width for larger screens */
+            margin: 40px auto;
+            padding: 30px;
+            background-color: var(--white-color);
+            box-shadow: var(--shadow);
+            border-radius: var(--border-radius);
         }
-        h1, h2 {
-            color: #333;
+
+        h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-top: 0;
         }
+
+        h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: var(--dark-color);
+            margin-bottom: 15px;
+        }
+
         .project-section {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 50px; /* Increased spacing */
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--gray-border);
         }
-        .map-container iframe {
-            width: 100%; 
-            height: 900px; 
-            border: 1px solid #ccc;         }
+        .project-section:last-of-type {
+            border-bottom: none; /* No border for the last section */
+            margin-bottom: 0;
+        }
+
+        p {
+            margin-bottom: 1.2em;
+        }
+
+        ul {
+            list-style-type: none; /* Remove default bullets */
+            padding-left: 0;
+        }
+
+        ul li {
+            padding-left: 1.5em;
+            position: relative;
+            margin-bottom: 0.8em;
+        }
+
+        ul li::before {
+            content: '✓'; /* Checkmark icon */
+            color: var(--secondary-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 1px;
+        }
+
+        .show-map-button {
+            display: inline-block; 
+            margin: 25px 0; /* Adjusted margin */
+            padding: 12px 25px;
+            font-size: 1em;
+            font-weight: bold;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            border: none;
+            border-radius: var(--border-radius);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .show-map-button:hover, .show-map-button:focus {
+            background-color: darken(var(--primary-color), 10%); /* Darken on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        /* Helper function for darken (CSS doesn't have it, so I  use a slightly darker fixed color) */
+        .show-map-button:hover, .show-map-button:focus {
+            background-color: #0056b3; /* Darker blue */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+
+        #original-map-container {
+            display: none; /* Hidden by default, JavaScript will show it */
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fdfdfd; /* Slightly off-white for contrast */
+            border: 1px solid var(--gray-border);
+            border-radius: var(--border-radius);
+        }
+
+        .map-container iframe,
+        .map-container arcgis-embedded-map { /* Apply styles to both iframe and arcgis-embedded-map */
+            width: 100%;
+            height: 600px; /* Adjusted height for better proportion */
+            border: 1px solid var(--gray-border);
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: block; /* Ensure arcgis-embedded-map behaves like a block element */
+        }
+
         footer {
             text-align: center;
-            padding: 1em 0;
-            background-color: #333;
-            color: #fff;
-            margin-top: 30px;
+            padding: 2em 1em;
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            margin-top: 50px;
+            font-size: 0.9em;
         }
+        footer p {
+            margin: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+            header h1 {
+                font-size: 2.2em;
+            }
+            h2 {
+                font-size: 1.8em;
+            }
+            .map-container iframe,
+            .map-container arcgis-embedded-map { /* Apply responsive height to both */
+                height: 450px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -62,7 +209,7 @@
             </p>
             <p>
                 The map utilizes Mapbox GL JS for rendering and interactivity,
-                visualizing data sourced from public crime incident reports.
+                visualizing data sourced from public crime incident reports. It is coded in HTML.
             </p>
 
             <div class="map-container">
@@ -72,40 +219,70 @@
             <p>
                 <em>Improvements from the first mapbox:</em>
             </p>
-            <p>
-                - Added a legend for the color bar that appears when you click an icon
-            </p>
-            <p>
-                - Added a filter that users can select, allowing them to see homicides by 
-                the month of 2024, by the Ward in DC, or both.
-            </p>
-            <p>
-                - Cleaned up the popup to make it look nicer
-            </p>
-            <p>
-                - Added a hyperlink at the bottom of each popup that searches on Google
-                for the crime and narrows down the search to articles posted on https://mpdc.dc.gov/, 
-                the website for the DC police. 
-            </p>
+            <ul>
+                <li>Added a legend for the color bar that appears when you click an icon.</li>
+                <li>Added a filter that users can select, allowing them to see homicides by
+                the month of 2024, by the Ward in DC, or both.</li>
+                <li>Added a hyperlink at the bottom of each popup that searches on Google
+                for the crime and narrows down the search to articles posted on https://mpdc.dc.gov/,
+                the website for the DC police.</li>
+            </ul>
 
+            <button id="showOriginalCrimeMapBtn" class="show-map-button">Show Original Full Crime Map</button>
 
-            <p>
+            <div id="original-map-container" class="map-container">
+                <h3>Original Mapbox Map (dc_crime_map)</h3>
+                <iframe id="originalCrimeMapIframe" src="" title="Original DC Crime Map" data-src="DC_Crime_Map_SL.html"></iframe>
+            </div>
 
-            </p>
         </section>
 
         <section class="project-section">
-            <h2>Project 2</h2>
+            <h2>Project 2: My Awesome Next Project</h2>
             <p>
+                
             </p>
-        </section>
+            <p>
+                
+            </p>
 
+            <div class="map-container">
+                <iframe src="https://storymaps.arcgis.com/stories/fd633070e0044b57afd09a9e6ee9f9cc/embed?cover=false" width="100%" height="500px" frameborder="0" allowfullscreen allow="geolocation"></iframe>
+            </div>
+            <p>gg</p>
+        </section>
 
     </div>
 
     <footer>
-        <p> 2025 Sophie Lind - Web GIS Portfolio</p>
+        <p>© 2025 Sophie Lind - Web GIS Portfolio</p>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const showButton = document.getElementById('showOriginalCrimeMapBtn');
+            const mapContainer = document.getElementById('original-map-container');
+            const mapIframe = document.getElementById('originalCrimeMapIframe');
+
+            if (showButton && mapContainer && mapIframe) {
+                showButton.addEventListener('click', function() {
+                    if (mapIframe.getAttribute('src') === '') {
+                        mapIframe.setAttribute('src', mapIframe.dataset.src);
+                    }
+                    // Toggle display
+                    if (mapContainer.style.display === 'block') {
+                        mapContainer.style.display = 'none';
+                        showButton.textContent = 'Show Original Full Crime Map';
+                    } else {
+                        mapContainer.style.display = 'block';
+                        showButton.textContent = 'Hide Original Full Crime Map';
+                    }
+                });
+            } else {
+                console.error('Required elements for map toggle not found');
+            }
+        });
+    </script>
 
 </body>
 </html>

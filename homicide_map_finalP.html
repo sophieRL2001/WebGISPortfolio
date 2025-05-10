@@ -126,7 +126,6 @@
         <div><span class="legend-key" style="background-color: #E31A1C;"></span>Gun</div>
         <div><span class="legend-key" style="background-color: #FF7F00;"></span>Knife</div>
         <div><span class="legend-key" style="background-color: #33A02C;"></span>Others</div>
-        <div><span class="legend-key" style="background-color: #B0B0B0;"></span>Unknown/Other</div>
     </div>
 
     <script>
@@ -136,7 +135,7 @@
             container: 'map',
             style: 'mapbox://styles/sophierose724/cmaik8iy6019701s045l5bp0z',
             center: [-77.0369, 38.9072],
-            zoom: 11.5
+            zoom: 11
         });
 
         map.addControl(new mapboxgl.NavigationControl());
@@ -199,7 +198,6 @@
                     <p><strong>Block:</strong> ${f.properties.BLOCK || 'N/A'}</p>
                     <p><strong>Ward:</strong> ${f.properties.WARD || 'N/A'}</p>
                     <p><strong>District:</strong> ${f.properties.DISTRICT || 'N/A'}</p>
-                    <p><strong>Neighborhood Cluster:</strong> ${f.properties.NEIGHBORHOOD_CLUSTER || 'N/A'}</p>
                     <p style="margin-top: 10px;"><a href="${searchUrl}" target="_blank" rel="noopener noreferrer">Search for this incident</a></p>
                 `)
                 .addTo(map);
