@@ -137,7 +137,8 @@
         }
 
 
-        #original-map-container {
+        #original-map-container,
+        #original-google-map-container { /* Apply to both original map containers */
             display: none; /* Hidden by default, JavaScript will show it */
             margin-top: 30px;
             padding: 20px;
@@ -252,12 +253,14 @@
                 The purpose of this section is to show improvements guided from the TA. I felt like I my original work was strong, but there were definitely areas that needed to be 
                 changed and fixed.
             </p>
-            <li> Missing data: I didn't have New Hamphire </li>
-            <li> Legends: I was missing legends in some of my maps</li>
-            <li> Symbology: Some of my symbols weren't clear</li>
-            <li> Consistent/Logical map extents: I had one map looking at the entirety of NE, 
-                when it was just NH and VT involved </li>
-            <li> Excessive data: I had too many things going on at once. </li>
+            <ul>
+                <li>Missing data: I didn't have New Hampshire</li>
+                <li>Legends: I was missing legends in some of my maps</li>
+                <li>Symbology: Some of my symbols weren't clear</li>
+                <li>Consistent/Logical map extents: I had one map looking at the entirety of NE, 
+                    when it was just NH and VT involved </li>
+                <li>Excessive data: I had too many things going on at once. </li>
+            </ul>
             <p>
                 Explore the StoryMaps for this project:
             </p>
@@ -268,6 +271,38 @@
             <p> <em>Sidenote: I tried for a while to get the storymaps embed to work, but, every time, it would just say that storymaps.arcgis refused to connect.</em></p>
         </section>
 
+        <section class="project-section">
+            <h2>Google Maps: Amherst Exploration</h2>
+            <p>
+                This project involved creating and refining custom Google Maps. The initial map explored various points of interest on the UMass Campus, but it was pretty bare, and had a lot of room for improvement.  
+                     
+            </p>
+            <p>
+                The updated map has images of the locations, links the sites if they exist, and a more visually pleasing layout/
+            </p>
+
+            <div class="map-container">
+                <h3>Updated Amherst Google Map</h3>
+                <iframe src="amherst_map.html" title="Updated Amherst, MA Map"></iframe>
+            </div>
+
+            <p>
+                <em>Key improvements in the updated map (<code>amherst_map.html</code>) include:</em>
+            </p>
+            <ul>
+                <li>Enhanced marker customization and more informative pop-up windows.</li>
+                <li>Improved map styling for better visual clarity and user experience.</li>
+                <li>Made sure all the points were in the initial load screen</li>
+            </ul>
+
+            <button id="showOriginalGoogleMapBtn" class="show-map-button">Show Original Google Map (custommapsophielind)</button>
+
+            <div id="original-google-map-container" class="map-container">
+                <h3>Original Google Map (custommapsophielind.html)</h3>
+                <iframe id="originalGoogleMapIframe" src="" title="Original Custom Google Map" data-src="custommapsophielind.html"></iframe>
+            </div>
+        </section>
+
     </div>
 
     <footer>
@@ -276,27 +311,47 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const showButton = document.getElementById('showOriginalCrimeMapBtn');
-            const mapContainer = document.getElementById('original-map-container');
-            const mapIframe = document.getElementById('originalCrimeMapIframe');
+            // Toggle for Original DC Crime Map
+            const showDCCrimeButton = document.getElementById('showOriginalCrimeMapBtn');
+            const dcCrimeMapContainer = document.getElementById('original-map-container');
+            const dcCrimeMapIframe = document.getElementById('originalCrimeMapIframe');
 
-            if (showButton && mapContainer && mapIframe) {
-                showButton.addEventListener('click', function() {
-                    if (mapIframe.getAttribute('src') === '') {
-                        mapIframe.setAttribute('src', mapIframe.dataset.src);
-                    }
-                    // Toggle display
-                    if (mapContainer.style.display === 'block') {
-                        mapContainer.style.display = 'none';
-                        showButton.textContent = 'Show Original Full Crime Map';
-                    } else {
-                        mapContainer.style.display = 'block';
-                        showButton.textContent = 'Hide Original Full Crime Map';
-                    }
-                });
-            } else {
-                console.error('Required elements for map toggle not found');
-            }
+
+            showDCCrimeButton.addEventListener('click', function() {
+                if (dcCrimeMapIframe.getAttribute('src') === '') {
+                    dcCrimeMapIframe.setAttribute('src', dcCrimeMapIframe.dataset.src);
+                }
+                // Toggle display
+                if (dcCrimeMapContainer.style.display === 'block') {
+                    dcCrimeMapContainer.style.display = 'none';
+                    showDCCrimeButton.textContent = 'Show Original Full Crime Map';
+                } else {
+                    dcCrimeMapContainer.style.display = 'block';
+                    showDCCrimeButton.textContent = 'Hide Original Full Crime Map';
+                }
+            });
+
+
+            // Toggle for Original Google Map
+            const showGoogleMapButton = document.getElementById('showOriginalGoogleMapBtn');
+            const googleMapContainer = document.getElementById('original-google-map-container');
+            const googleMapIframe = document.getElementById('originalGoogleMapIframe');
+
+
+            showGoogleMapButton.addEventListener('click', function() {
+                if (googleMapIframe.getAttribute('src') === '') {
+                    googleMapIframe.setAttribute('src', googleMapIframe.dataset.src);
+                }
+                // Toggle display
+                if (googleMapContainer.style.display === 'block') {
+                    googleMapContainer.style.display = 'none';
+                    showGoogleMapButton.textContent = 'Show Original Google Map (custommapsophielind)';
+                } else {
+                    googleMapContainer.style.display = 'block';
+                    showGoogleMapButton.textContent = 'Hide Original Google Map (custommapsophielind)';
+                }
+            });
+             
         });
     </script>
 
