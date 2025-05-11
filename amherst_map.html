@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Amherst Campus Map - SL</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+      #map-container {
+        display: flex;
+        height: 100%;
+      }
+      #sidebar {
+        width: 250px;
+        padding: 15px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+        border-right: 1px solid #ddd;
+      }
+      #sidebar h2 {
+        margin-top: 0;
+        font-size: 1.2em;
+      }
+      #sidebar ul {
+        list-style: none;
+        padding: 0;
+      }
+      #sidebar li {
+        padding: 8px 0;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+      }
+      #sidebar li:hover {
+        background-color: #e9e9e9;
+      }
+      #map {
+        flex-grow: 1; /* Map takes remaining space */
+        height: 100%;
+      }
+      .filter-group {
+        margin-bottom: 20px;
+      }
+      .filter-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      .filter-group select {
+        width: 100%;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+    </style>
+</head>
+<body>
+    <div id="map-container">
+        <div id="sidebar">
+            <h2>Locations</h2>
+            <div class="filter-group">
+                <label for="category-filter">Filter by Type:</label>
+                <select id="category-filter">
+                    <option value="all">All Locations</option>
+                    <option value="landmark">Landmarks</option>
+                    <option value="academic">Academic Buildings</option>
+                    <option value="nature">Nature & Outdoors</option>
+                </select>
+            </div>
+            <ul id="location-list">
+            </ul>
+        </div>
+        <div id="map"></div>
+    </div>
+
+    <script>
+      let map; // Make map and infowindow globally accessible within the script
+      let infowindow;
+      let allMarkers = []; // To keep track of all markers for filtering
+
+      // Function to initialize the map - Google Maps API will call this
+      function initMap() {
+        
+        const locations = [
+        { 
+            lat: 42.389532, 
+            lng: -72.526531, 
+            title: 'Campus Pond', 
+            image: 'campus_pond.jpg', 
+            description: 'A beautiful central feature of the UMass Amherst campus.', 
+            category: 'nature' 
+        },
+        { 
+            lat: 42.389193, 
+            lng: -72.527251, 
+            title: 'Minuteman Statue', 
+            image: 'minuteman_statue.jpg', 
+            description: 'Iconic statue representing the spirit of UMass.', 
+            category: 'landmark' 
+        },
+        { 
+            lat: 42.389986, 
+            lng: -72.528361, 
+            title: 'Our Classroom in Du Bois Library', 
+            image: 'dubois_library.jpg', 
+            description: 'The tallest academic library in the world!', 
+            category: 'academic',
+            link: 'https://www.library.umass.edu/' // Added link for Library
+        },
+        { 
+            lat: 42.390033, 
+            lng: -72.524442, 
+            title: 'Geosciences in Morrill', 
+            image: 'morrill.jpg', 
+            description: 'Home to the Department of Geosciences.', 
+            category: 'academic',
+            link: 'https://events.umass.edu/morrill_science_center_ii' // Added link for Morrill
+        }, 
+        { 
+            lat: 42.392869, 
+            lng: -72.530839, 
+            title: 'Environmental Conservation in Holdsworth', 
+            image: 'holdsworth.jpg', 
+            description: 'Focuses on sustainability and environmental studies.', 
+            category: 'academic',
+            link: 'https://www.umass.edu/environmental-conservation/' // Added link for Holdsworth
+        },
+        { 
+            lat: 42.3860, 
+            lng: -72.5250, 
+            title: 'Fine Arts Center', 
+            image: 'fac.jpg', 
+            description: 'Hub for arts and performances.', 
+            category: 'academic' 
+        },
+        { 
+            lat: 42.3917, 
+            lng: -72.5260, 
+            title: 'Recreation Center', 
+            image: 'rec_center.jpg', 
+            description: 'State-of-the-art fitness facilities.', 
+            category: 'landmark',
+            link: 'https://www.umass.edu/recwell/' // Added link for Rec Center
+        }
+    ];
+
+        const mapCenter = { lat: 42.389986, lng: -72.528361 };
+
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 16, 
+          center: mapCenter
+        });
+
+        infowindow = new google.maps.InfoWindow();
+        const locationList = document.getElementById('location-list');
+
+        locations.forEach((location, index) => {
+          const marker = new google.maps.Marker({
+            position: { lat: location.lat, lng: location.lng }, 
+            map: map,
+            title: location.title,
+            locationData: location, // Store all location data
+            animation: google.maps.Animation.DROP // Add a little drop animation
+          });
+          allMarkers.push(marker); // Add to our array for filtering
+
+          marker.addListener('click', () => {
+            openInfoWindow(marker);
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(() => marker.setAnimation(null), 700); // Stop bounce after a short time
+          });
+
+          // Populate the sidebar list
+          const listItem = document.createElement('li');
+          listItem.textContent = location.title;
+          listItem.addEventListener('click', () => {
+            map.panTo(marker.getPosition());
+            map.setZoom(18); // Zoom in closer when a list item is clicked
+            openInfoWindow(marker);
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(() => marker.setAnimation(null), 700);
+          });
+          locationList.appendChild(listItem);
+        }); 
+
+        // Add event listener for the filter dropdown
+        document.getElementById('category-filter').addEventListener('change', filterMarkers);
+
+      } 
+
+      function openInfoWindow(marker) {
+    let linkHTML = '';
+    if (marker.locationData.link) {
+        linkHTML = `<p style="font-size: 0.9em; margin-top: 10px; margin-bottom: 0;">
+                        <a href="${marker.locationData.link}" target="_blank" rel="noopener noreferrer">More Info</a>
+                    </p>`;
+    }
+
+    const contentString = `
+        <div style="font-family: Arial, sans-serif; max-width: 300px; max-height: 350px; overflow-y: auto;">
+            <h3 style="margin-top:0; margin-bottom: 10px;">${marker.locationData.title}</h3>
+            <img src="./images/${marker.locationData.image}" alt="${marker.locationData.title}" style="width:100%; max-height:150px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;" onerror="this.style.display='none'">
+            <p style="font-size: 0.9em; margin-bottom: 0;">${marker.locationData.description || ''}</p>
+            ${linkHTML} 
+        </div>`;
+    infowindow.setContent(contentString);
+    infowindow.open(map, marker);
+}
+
+
+      function filterMarkers() {
+        const selectedCategory = document.getElementById('category-filter').value;
+        infowindow.close(); // Close any open infowindow when filtering
+
+        allMarkers.forEach(marker => {
+            if (selectedCategory === 'all' || marker.locationData.category === selectedCategory) {
+                marker.setVisible(true);
+            } else {
+                marker.setVisible(false);
+            }
+        });
+      }
+
+    </script>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap">
+    </script>
+
+</body>
+</html>

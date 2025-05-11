@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Amherst Campus Map - SL</title>
+    <style>
+      /* keep it simple: map fills the page */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      /* The div where the map will go needs height */
+      #map {
+        height: 100%;
+      }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+      // Function to initialize the map - Google Maps API will call this
+      function initMap() {
+        
+        const locations = [
+          { lat: 42.389532, lng: -72.526531, title: 'Campus Pond' },
+          { lat: 42.389193, lng: -72.527251, title: 'Minuteman Statue' },
+          { lat: 42.389986, lng: -72.528361, title: 'Our Classroom in Du Bois Library' }, // This is also our center
+          { lat: 42.390033, lng: -72.524442, title: 'Geosciences in Morrill' }, 
+          { lat: 42.392869, lng: -72.530839, title: 'Environmental Conservation in Holdsworth' } 
+        ];
+
+        // (using Du Bois Library coords)
+        const mapCenter = { lat: 42.389986, lng: -72.528361 };
+
+        const map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 17.25, 
+          center: mapCenter
+        });
+
+        // Create ONE InfoWindow object - we can reuse it for any marker
+        const infowindow = new google.maps.InfoWindow();
+
+        locations.forEach(location => {
+          const marker = new google.maps.Marker({
+            position: { lat: location.lat, lng: location.lng }, 
+            map: map,
+            title: location.title
+          });
+
+          marker.addListener('click', () => {
+            infowindow.setContent(marker.getTitle()); 
+            infowindow.open(map, marker);
+          });
+        }); 
+
+      } 
+
+    </script>
+
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap">
+    </script>
+
+</body>
+</html>
