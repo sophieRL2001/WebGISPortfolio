@@ -148,32 +148,7 @@
             'DEFAULT': '#B0B0B0'
         };
 
-        map.on('load', () => {
-            // Apply data-driven styling for circle color based on METHOD
-            map.setPaintProperty('HOMICIDE', 'circle-color', [
-                'match',
-                ['upcase', ['to-string', ['get', 'METHOD']]],
-                'GUN', methodColors.GUN,
-                'KNIFE', methodColors.KNIFE,
-                'OTHERS', methodColors.OTHERS,
-                methodColors.DEFAULT
-            ]);
-
-            // Set a default circle radius and stroke
-            map.setPaintProperty('HOMICIDE', 'circle-radius', 6);
-            map.setPaintProperty('HOMICIDE', 'circle-stroke-width', 1);
-            map.setPaintProperty('HOMICIDE', 'circle-stroke-color', '#FFFFFF');
-            map.setPaintProperty('HOMICIDE', 'circle-opacity', 0.85);
-
-            // Basic cursor change on hover (no feature state changes)
-            map.on('mouseenter', 'HOMICIDE', () => {
-                map.getCanvas().style.cursor = 'pointer';
-            });
-            map.on('mouseleave', 'HOMICIDE', () => {
-                map.getCanvas().style.cursor = '';
-            });
-        });
-
+        months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         map.on('click', 'HOMICIDE', (e) => {
             if (!e.features || !e.features.length) return;
 
@@ -185,8 +160,9 @@
             const method = f.properties.METHOD ? String(f.properties.METHOD).toUpperCase() : 'UNKNOWN';
             const pointColor = methodColors[method] || methodColors.DEFAULT;
 
-  
-            const searchUrl = `https://www.google.com/search?q=${date} homicide DC site:https://mpdc.dc.gov/`;
+            monthSearch = months[parseInt(date.split('/'))-1];
+            restSearch = date.slice(date.indexOf('/')+1);
+            const searchUrl = `https://www.google.com/search?q=${monthSearch} ${restSearch} homicide DC site:https://mpdc.dc.gov/`;
 
 
             new mapboxgl.Popup({ offset: [0, -15] })
