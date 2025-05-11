@@ -20,7 +20,7 @@
 
     <script>
       // Function to initialize the map - Google Maps API will call this
-      function initMap() {
+      async function initMap() { // Made async to await importLibrary if needed, though not strictly necessary here
         
         const locations = [
           { lat: 42.389532, lng: -72.526531, title: 'Campus Pond' },
@@ -35,31 +35,33 @@
 
         const map = new google.maps.Map(document.getElementById('map'), {
           zoom: 17.25, 
-          center: mapCenter
+          center: mapCenter,
+          mapId: 'DEMO_MAP_ID' // Recommended for Advanced Markers, though not strictly required for basic functionality
         });
 
         // Create ONE InfoWindow object - we can reuse it for any marker
         const infowindow = new google.maps.InfoWindow();
 
         locations.forEach(location => {
-          const marker = new google.maps.Marker({
+          // Using AdvancedMarkerElement
+          const marker = new google.maps.marker.AdvancedMarkerElement({
             position: { lat: location.lat, lng: location.lng }, 
             map: map,
             title: location.title
           });
 
           marker.addListener('click', () => {
-            infowindow.setContent(marker.getTitle()); 
-            infowindow.open(map, marker);
+            infowindow.setContent(marker.title); // Use marker.title directly
+            infowindow.open(map, marker); // AdvancedMarkerElement can be used as an anchor
           });
         }); 
 
       } 
 
     </script>
-    
+
     <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap">
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&libraries=marker">
     </script>
 
 </body>
