@@ -111,8 +111,8 @@
         }
 
         .show-map-button {
-            display: inline-block; 
-            margin: 25px 0; /* Adjusted margin */
+            display: inline-block;
+            margin: 20px 5px 20px 0; /* Adjusted margin for multiple buttons */
             padding: 12px 25px;
             font-size: 1em;
             font-weight: bold;
@@ -126,18 +126,14 @@
             letter-spacing: 0.5px;
             transition: background-color 0.3s ease, transform 0.2s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            text-decoration: none; /* Remove underline from links styled as buttons */
         }
 
-        .show-map-button:hover, .show-map-button:focus {
-            background-color: darken(var(--primary-color), 10%); /* Darken on hover */
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        /* Helper function for darken (CSS doesn't have it, so I  use a slightly darker fixed color) */
         .show-map-button:hover, .show-map-button:focus {
             background-color: #0056b3; /* Darker blue */
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            color: var(--white-color); /* Ensure text color stays white on hover */
         }
 
 
@@ -188,6 +184,16 @@
             .map-container arcgis-embedded-map { /* Apply responsive height to both */
                 height: 450px;
             }
+            .show-map-button {
+                display: block; /* Stack buttons on smaller screens */
+                width: calc(100% - 50px); /* Adjust width considering padding */
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+            }
+            .show-map-button + .show-map-button { /* Add margin top to subsequent buttons when stacked */
+                 margin-top: 15px;
+            }
         }
 
     </style>
@@ -201,7 +207,7 @@
     <div class="container">
 
         <section class="project-section">
-            <h2>Project 1: DC Homicide Incidents Map</h2>
+            <h2>DC Homicide Incidents Map</h2>
             <p>
                 This interactive map displays homicide incidents in DC for 2024.
                 You can click on incidents to see more details and use the filters
@@ -238,18 +244,25 @@
         </section>
 
         <section class="project-section">
-            <h2>Project 2: My Awesome Next Project</h2>
+            <h2>Data Configuration</h2>
             <p>
-                Details about my second amazing Web GIS project will go here. It will feature innovative uses of spatial data and cutting-edge web technologies to solve a real-world problem or provide insightful visualizations.
+                The purpose of this section is to show improvements guided from the TA. For the original assigment, 
+                I got the following feedback:
             </p>
+            <li> Missing data: I didn't have New Hamphire </li>
+            <li> Legends: I was missing legends in some of my maps</li>
+            <li> Symbology: Some of my symbols weren't clear</li>
+            <li> Consistent/Logical map extents: I had one map looking at the entirety of NE, 
+                when it was just NH and VT involved </li>
+            <li> Excessive data: I had too many things going on at once. I </li>
             <p>
-                Below is an example of an embedded ArcGIS StoryMap that could be featured in a future project:
+                Explore the StoryMaps for this project:
             </p>
-
-            <div class="map-container">
-                <iframe src="https://storymaps.arcgis.com/stories/fd633070e0044b57afd09a9e6ee9f9cc/embed?cover=false" width="100%" height="500px" frameborder="0" allowfullscreen allow="geolocation"></iframe>
+            <div> 
+                <a href="https://arcg.is/1TW8912" target="_blank" rel="noopener noreferrer" class="show-map-button">View Updated StoryMap</a>
+                <a href="https://storymaps.arcgis.com/stories/fd633070e0044b57afd09a9e6ee9f9cc" target="_blank" rel="noopener noreferrer" class="show-map-button">View Original StoryMap</a>
             </div>
-            <p>Stay tuned for updates!</p>
+            <p> <em>Sidenote: I tried for a while to get the storymaps embed work, but, every time, it would just say that storymaps.arcgis refused to connect.</em></p>
         </section>
 
     </div>
